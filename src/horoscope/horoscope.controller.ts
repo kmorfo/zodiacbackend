@@ -1,20 +1,15 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { HoroscopeService } from './horoscope.service';
-import { Horoscope } from './entity/horoscope.entity';
-
+import { ParamsDto } from './dto/params.dto';
 
 @Controller('horoscope')
 export class HoroscopeController {
   constructor(private readonly horoscopeService: HoroscopeService) { }
 
-  @Get()
-  findAll(): Horoscope[] {
-    return this.horoscopeService.findAll();
-  }
 
-  @Get(':sign')
-  findOne(@Param('sign') sign: string) {
-    return this.horoscopeService.findOne(sign);
+  @Get()
+  findOne(@Query() paramsDto: ParamsDto) {
+    return this.horoscopeService.findOne(paramsDto);
   }
 
 }

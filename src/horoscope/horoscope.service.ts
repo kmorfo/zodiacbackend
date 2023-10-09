@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Horoscope } from './entity/horoscope.entity';
+import { ParamsDto } from './dto/params.dto';
 
 
 @Injectable()
@@ -21,18 +22,22 @@ export class HoroscopeService {
   ]
 
 
-  async findOne(id: string): Promise<Horoscope> {
-    let sign = this.zodiac.find(sign => sign.name === id)
-    if (!sign) throw new NotFoundException(`Sign ${id} not found`)
+  async findOne(paramsDto: ParamsDto): Promise<Horoscope> {
+    const { name, daily, weelky } = paramsDto;
 
-    await this.getDailyPrediction(sign);
-    await this.getWeeklyPrediction(sign);
+    let sign = this.zodiac.find(sign => sign.name === name)
+    if (!sign) throw new NotFoundException(`Sign ${name} not found`)
 
-    return sign;
-  }
+    if (daily) await this.getDailyPrediction(sign);
+    if (weelky) await this.getWeeklyPrediction(sign);
 
-  findAll(): Horoscope[] {
-    return this.zodiac
+    const returnSign = { ...sign }
+    delete returnSign.lastUpdatedDaily
+    delete returnSign.lastUpdatedWeekly
+    if (!daily) delete returnSign.daily
+    if (!weelky) delete returnSign.weekly
+
+    return returnSign;
   }
 
 

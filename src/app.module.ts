@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { HoroscopeModule } from './horoscope/horoscope.module';
+import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
-  imports: [HoroscopeModule],
+  imports: [
+    ConfigModule.forRoot(),
+    HoroscopeModule,
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

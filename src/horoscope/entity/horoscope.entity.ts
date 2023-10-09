@@ -2,7 +2,11 @@
 export class Horoscope {
     name: string;
 
-    prediction?: string;
-
-    lastUpdated?: Date;
+    daily?: string;
+    
+    lastUpdatedDaily?: Date;
+    
+    weekly?: string;
+    
+    lastUpdatedWeekly?: Date;
 }

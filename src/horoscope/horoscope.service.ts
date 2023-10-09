@@ -25,33 +25,28 @@ export class HoroscopeService {
     let sign = this.zodiac.find(sign => sign.name === id)
     if (!sign) throw new NotFoundException(`Sign ${id} not found`)
 
-    sign = await this.getPrediction(sign)
+    await this.getDailyPrediction(sign);
+    await this.getWeeklyPrediction(sign);
 
-    return sign
+    return sign;
   }
 
   findAll(): Horoscope[] {
     return this.zodiac
   }
 
-  private async getPrediction(sign: Horoscope): Promise<Horoscope> {
-    const now = new Date();
-    // Define the number of milisegundos in 24 hours
+
+  private async getDailyPrediction(horoscope: Horoscope): Promise<void> {
+    const now = new Date()
     const milisIn24Hours = 24 * 60 * 60 * 1000;
-    const diffInMilis = now.getTime() - sign.lastUpdated?.getTime() ?? 0
 
-    if (!sign.prediction || diffInMilis > milisIn24Hours) {
-      sign.prediction = await this.getLecturasPrediction(sign.name);
-      sign.lastUpdated = new Date()
-      return sign;
-    }
+    const diffInMilis = now.getTime() - horoscope.lastUpdatedDaily?.getTime() ?? 0;
 
-    return sign;
-  }
+    if (horoscope.daily != undefined && diffInMilis < milisIn24Hours)
+      return;
 
-  private async getLecturasPrediction(horoscope: string): Promise<string> {
     const requestPage = await fetch(
-      `https://www.lecturas.com/horoscopo/${horoscope}`
+      `https://www.lecturas.com/horoscopo/${horoscope.name}`
     );
     let pageText = await requestPage.text();
     let startHoroscope = pageText.indexOf(`<div class="txt">`);
@@ -62,9 +57,39 @@ export class HoroscopeService {
     let textoSinEtiquetas = prediction.replace(/<[^>]+>/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/&nbsp;/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
-    console.log(textoSinEtiquetas);
 
-    return textoSinEtiquetas;
+    horoscope.daily = textoSinEtiquetas;
+    horoscope.lastUpdatedDaily = new Date()
+    return;
+  }
+
+  private async getWeeklyPrediction(horoscope: Horoscope): Promise<void> {
+    const now = new Date()
+    const milisInOneWeek = 24 * 60 * 60 * 1000 * 7;
+
+    const diffInMilis = now.getTime() - horoscope.lastUpdatedWeekly?.getTime() ?? 0;
+
+    if (horoscope.weekly != undefined && diffInMilis < milisInOneWeek)
+      return;
+
+    const requestPage = await fetch(
+      `https://www.lecturas.com/horoscopo/${horoscope.name}`
+    );
+    let pageText = await requestPage.text();
+    let startHoroscope = pageText.indexOf(`<!-- horoscopo Semanal-->`);
+    let endHoroscope = pageText.indexOf(`Tu número de la suerte`);
+
+    //Eliminamos las etiquetas HTML del texto
+    let prediction = pageText.substring(startHoroscope, endHoroscope + 25);
+    let textoSinEtiquetas = prediction.replace(/<[^>]+>/g, "");
+    textoSinEtiquetas = textoSinEtiquetas.replace(/&nbsp;/g, "");
+    textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
+
+    let startWeekText = textoSinEtiquetas.indexOf(`semanal`);
+    let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7);
+
+    horoscope.weekly = predictionWeekly;
+    horoscope.lastUpdatedWeekly = new Date();
   }
 
 

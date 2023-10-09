@@ -82,17 +82,17 @@ export class HoroscopeService {
     );
     let pageText = await requestPage.text();
     let startHoroscope = pageText.indexOf(`<!-- horoscopo Semanal-->`);
-    let endHoroscope = pageText.indexOf(`Tu número de la suerte`);
+    let endHoroscope = pageText.indexOf(`número de la suerte`);
 
     //Eliminamos las etiquetas HTML del texto
-    let prediction = pageText.substring(startHoroscope, endHoroscope + 25);
+    let prediction = pageText.substring(startHoroscope, endHoroscope + 22);
     let textoSinEtiquetas = prediction.replace(/<[^>]+>/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/&nbsp;/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
 
     let startWeekText = textoSinEtiquetas.indexOf(`semanal`);
     let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7);
-
+ 
     horoscope.weekly = predictionWeekly;
     horoscope.lastUpdatedWeekly = new Date();
   }

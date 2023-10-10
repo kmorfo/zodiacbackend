@@ -1,7 +1,7 @@
 
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsOptional, IsString, MaxLength } from "class-validator";
 
 
 export class ParamsDto {
@@ -12,7 +12,7 @@ export class ParamsDto {
         required: true
     })
     @IsString()
-    name: string
+    name: string;
 
     @ApiProperty({
         description: "Indicate if you need the daily predicction",
@@ -34,6 +34,17 @@ export class ParamsDto {
     @IsBoolean()
     @Transform(({ value }) => value === '1' || value === 'true')
     weelky?: boolean;
+
+    @ApiProperty({
+        description: "Set the languaje we want the prediction",
+        example: "es|en|de",
+        default: "es",
+        required: false
+    })
+    @IsString()
+    @MaxLength(2)
+    @IsOptional()
+    lang: string = 'es';
 
 
 }

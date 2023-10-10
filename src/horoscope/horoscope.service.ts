@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Horoscope } from './entity/horoscope.entity';
 import { ParamsDto } from './dto/params.dto';
-
+import { translate } from 'bing-translate-api';
 
 @Injectable()
 export class HoroscopeService {
@@ -23,19 +23,26 @@ export class HoroscopeService {
 
 
   async findOne(paramsDto: ParamsDto): Promise<Horoscope> {
-    const { name, daily, weelky } = paramsDto;
+    const { name, daily, weelky, lang } = paramsDto;
 
     let sign = this.zodiac.find(sign => sign.name === name)
     if (!sign) throw new NotFoundException(`Sign ${name} not found`)
 
-    if (daily) await this.getDailyPrediction(sign);
-    if (weelky) await this.getWeeklyPrediction(sign);
+
+    if (daily) {
+      await this.getDailyPrediction(sign);
+      if (lang != 'es') sign.daily = await this.translatePrediction(lang, sign.daily);
+    }
+    if (weelky) {
+      await this.getWeeklyPrediction(sign);
+      if (lang != 'es') sign.weekly = await this.translatePrediction(lang, sign.weekly);
+    }
 
     const returnSign = { ...sign }
     delete returnSign.lastUpdatedDaily
     delete returnSign.lastUpdatedWeekly
-    if (!daily) delete returnSign.daily
-    if (!weelky) delete returnSign.weekly
+    if (!daily) returnSign.daily = ""
+    if (!weelky) returnSign.weekly = ""
 
     return returnSign;
   }
@@ -65,6 +72,7 @@ export class HoroscopeService {
 
     horoscope.daily = textoSinEtiquetas;
     horoscope.lastUpdatedDaily = new Date()
+
     return;
   }
 
@@ -92,9 +100,18 @@ export class HoroscopeService {
 
     let startWeekText = textoSinEtiquetas.indexOf(`semanal`);
     let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7);
- 
+
     horoscope.weekly = predictionWeekly;
     horoscope.lastUpdatedWeekly = new Date();
+  }
+
+  private async translatePrediction(language: string, prediction: string): Promise<string> {
+    //This free translator has a maximum length of text is 1000 characters 
+    try{
+      return (await translate(prediction.substring(0,999), null, language)).translation
+    }catch(err){
+      return "Error while translate your predicction, Try again on use other language "
+    }
   }
 
 

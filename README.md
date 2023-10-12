@@ -3,7 +3,7 @@
 </p>
 
 ## Description
-**Zodiac Backend** is a backend for the app [CienciasOcultas](https://github.com/kmorfo/CienciasOcultasApp)
+**Zodiac Backend** is a backend for [CienciasOcultas](https://github.com/kmorfo/CienciasOcultasApp) kotlin app
 This backend provides a prediction for the zodiacal sign requested in the language sent in parameters
 
 We can get daily or weekly predictions according out needed

@@ -21,13 +21,11 @@ export class HoroscopeService {
     { name: "piscis" }
   ]
 
-
   async findOne(paramsDto: ParamsDto): Promise<Horoscope> {
     const { name, daily, weelky, lang } = paramsDto;
 
-    let sign = this.zodiac.find(sign => sign.name === name.toLowerCase())
-    if (!sign) throw new NotFoundException(`Sign ${name} not found`)
-
+    let sign = this.zodiac.find(sign => sign.name === name.toLowerCase());
+    if (!sign) throw new NotFoundException(`Sign ${name} not found`);
 
     if (daily) await this.getDailyPrediction(sign);
     if (weelky) await this.getWeeklyPrediction(sign);
@@ -36,12 +34,12 @@ export class HoroscopeService {
 
     if (lang != 'es') {
       returnSign.name = await this.translatePrediction(lang, sign.name);
-      returnSign.weekly = await this.translatePrediction(lang, sign.weekly);
-      returnSign.daily = await this.translatePrediction(lang, sign.daily);
+      if (weelky) returnSign.weekly = await this.translatePrediction(lang, returnSign.weekly);
+      if (daily) returnSign.daily = await this.translatePrediction(lang, returnSign.daily);
     }
 
-    delete returnSign.lastUpdatedDaily
-    delete returnSign.lastUpdatedWeekly
+    delete returnSign.lastUpdatedDaily;
+    delete returnSign.lastUpdatedWeekly;
     if (!daily) returnSign.daily = ""
     if (!weelky) returnSign.weekly = ""
 
@@ -50,7 +48,8 @@ export class HoroscopeService {
 
 
   private async getDailyPrediction(horoscope: Horoscope): Promise<void> {
-    const now = new Date()
+
+    const now = new Date();
     const milisIn24Hours = 24 * 60 * 60 * 1000;
 
     const diffInMilis = now.getTime() - horoscope.lastUpdatedDaily?.getTime() ?? 0;
@@ -72,7 +71,7 @@ export class HoroscopeService {
     textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
 
     horoscope.daily = textoSinEtiquetas;
-    horoscope.lastUpdatedDaily = new Date()
+    horoscope.lastUpdatedDaily = new Date();
 
     return;
   }
@@ -109,11 +108,11 @@ export class HoroscopeService {
   private async translatePrediction(language: string, prediction: string): Promise<string> {
     //This free translator has a maximum length of text is 1000 characters 
     try {
-      return (await translate(prediction.substring(0, 999), null, language)).translation
+      return (await translate(prediction.substring(0, 999), null, language)).translation;
     } catch (err) {
-      return "Error while translate your predicction, Try again on use other language "
+      console.log(err);
+      return "Error while translate your predicction, Try again on use other language ";
     }
   }
-
 
 }

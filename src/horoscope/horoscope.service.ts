@@ -111,7 +111,8 @@ export class HoroscopeService {
       return (await translate(prediction.substring(0, 999), null, language)).translation;
     } catch (err) {
       console.log(err);
-      return "Error while translate your predicction, Try again on use other language ";
+      //return "Error while translate your predicction, Try again on use other language ";
+      return prediction;
     }
   }
 

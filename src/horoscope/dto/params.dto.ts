@@ -33,7 +33,7 @@ export class ParamsDto {
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => value === '1' || value === 'true')
-    weelky?: boolean;
+    weekly?: boolean;
 
     @ApiProperty({
         description: "Set the languaje we want the prediction",

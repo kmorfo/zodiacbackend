@@ -22,26 +22,26 @@ export class HoroscopeService {
   ]
 
   async findOne(paramsDto: ParamsDto): Promise<Horoscope> {
-    const { name, daily, weelky, lang } = paramsDto;
+    const { name, daily, weekly, lang } = paramsDto;
 
     let sign = this.zodiac.find(sign => sign.name === name.toLowerCase());
     if (!sign) throw new NotFoundException(`Sign ${name} not found`);
 
     if (daily) await this.getDailyPrediction(sign);
-    if (weelky) await this.getWeeklyPrediction(sign);
+    if (weekly) await this.getWeeklyPrediction(sign);
 
     const returnSign = { ...sign }
 
     if (lang != 'es') {
       returnSign.name = await this.translatePrediction(lang, sign.name);
-      if (weelky) returnSign.weekly = await this.translatePrediction(lang, returnSign.weekly);
+      if (weekly) returnSign.weekly = await this.translatePrediction(lang, returnSign.weekly);
       if (daily) returnSign.daily = await this.translatePrediction(lang, returnSign.daily);
     }
 
     delete returnSign.lastUpdatedDaily;
     delete returnSign.lastUpdatedWeekly;
     if (!daily) returnSign.daily = ""
-    if (!weelky) returnSign.weekly = ""
+    if (!weekly) returnSign.weekly = ""
 
     return returnSign;
   }

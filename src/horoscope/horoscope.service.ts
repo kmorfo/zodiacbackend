@@ -22,13 +22,14 @@ export class HoroscopeService {
   ]
 
   async findOne(paramsDto: ParamsDto): Promise<Horoscope> {
-    const { name, daily, weekly, lang } = paramsDto;
+    const { name, daily, weekly, lucky,lang } = paramsDto;
 
     let sign = this.zodiac.find(sign => sign.name === name.toLowerCase());
     if (!sign) throw new NotFoundException(`Sign ${name} not found`);
 
     if (daily) await this.getDailyPrediction(sign);
     if (weekly) await this.getWeeklyPrediction(sign);
+    if(lucky && !weekly) await this.getWeeklyPrediction(sign);
 
     const returnSign = { ...sign }
 
@@ -45,7 +46,6 @@ export class HoroscopeService {
 
     return returnSign;
   }
-
 
   private async getDailyPrediction(horoscope: Horoscope): Promise<void> {
 
@@ -93,14 +93,18 @@ export class HoroscopeService {
     let endHoroscope = pageText.indexOf(`número de la suerte`);
 
     //Eliminamos las etiquetas HTML del texto
-    let prediction = pageText.substring(startHoroscope, endHoroscope + 22);
+    let prediction = pageText.substring(startHoroscope, endHoroscope+22 );
     let textoSinEtiquetas = prediction.replace(/<[^>]+>/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/&nbsp;/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
+    textoSinEtiquetas = textoSinEtiquetas.replace("<", "");
 
     let startWeekText = textoSinEtiquetas.indexOf(`semanal`);
-    let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7);
+    let endWeekText = textoSinEtiquetas.indexOf(`número de la suerte`);
+    let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7,endWeekText-3);
+    let lukyNumber =  textoSinEtiquetas.substring(endWeekText+19);
 
+    horoscope.lucky = lukyNumber.replace('.',"")
     horoscope.weekly = predictionWeekly;
     horoscope.lastUpdatedWeekly = new Date();
   }

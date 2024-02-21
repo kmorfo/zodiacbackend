@@ -25,10 +25,17 @@ export class Horoscope {
 
     @ApiProperty({
         example:'Te tocará la lotería',
-        description: 'Weekly prediction of this zodiac dign',
+        description: 'Weekly prediction of this zodiac sign',
         default: null
     })
     weekly?: string;
+
+    @ApiProperty({
+        example:'3',
+        description: 'Lucky number of the week for this zodiac sign',
+        default: null
+    })
+    lucky?: string;
 
     @ApiProperty({
         example: '08/06/2023, 11:49:13',

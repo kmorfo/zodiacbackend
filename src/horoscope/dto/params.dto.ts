@@ -33,6 +33,16 @@ export class ParamsDto {
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => value === '1' || value === 'true')
+    lucky?: boolean;
+
+    @ApiProperty({
+        description: "Indicate if you need the lucky number",
+        example: "1 | true",
+        required: false
+    })
+    @IsOptional()
+    @IsBoolean()
+    @Transform(({ value }) => value === '1' || value === 'true')
     weekly?: boolean;
 
     @ApiProperty({

@@ -93,11 +93,9 @@ export class HoroscopeService {
     let endHoroscope = pageText.indexOf(`número de la suerte`);
 
     //Eliminamos las etiquetas HTML del texto
-    let prediction = pageText.substring(startHoroscope, endHoroscope+22 );
-    let textoSinEtiquetas = prediction.replace(/<[^>]+>/g, "");
-    textoSinEtiquetas = textoSinEtiquetas.replace(/&nbsp;/g, "");
-    textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
-    textoSinEtiquetas = textoSinEtiquetas.replace("<", "");
+    let textoSinEtiquetas = pageText.substring(startHoroscope, endHoroscope + 22)
+    .replace(/<[^>]+>|&nbsp;|\r|<|div class=/g, "");
+
 
     let startWeekText = textoSinEtiquetas.indexOf(`semanal`);
     let endWeekText = textoSinEtiquetas.indexOf(`número de la suerte`);

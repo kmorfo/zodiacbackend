@@ -22,14 +22,14 @@ export class HoroscopeService {
   ]
 
   async findOne(paramsDto: ParamsDto): Promise<Horoscope> {
-    const { name, daily, weekly, lucky,lang } = paramsDto;
+    const { name, daily, weekly, lucky, lang } = paramsDto;
 
     let sign = this.zodiac.find(sign => sign.name === name.toLowerCase());
     if (!sign) throw new NotFoundException(`Sign ${name} not found`);
 
     if (daily) await this.getDailyPrediction(sign);
     if (weekly) await this.getWeeklyPrediction(sign);
-    if(lucky && !weekly) await this.getWeeklyPrediction(sign);
+    if (lucky && !weekly) await this.getWeeklyPrediction(sign);
 
     const returnSign = { ...sign }
 
@@ -90,19 +90,23 @@ export class HoroscopeService {
     );
     let pageText = await requestPage.text();
     let startHoroscope = pageText.indexOf(`<!-- horoscopo Semanal-->`);
-    let endHoroscope = pageText.indexOf(`número de la suerte`);
+    // let startHoroscope = pageText.toLowerCase().indexOf(`${horoscope.name.toLocaleLowerCase()} semanal`);
+    let endHoroscope = pageText.indexOf(`número de la`);
 
     //Eliminamos las etiquetas HTML del texto
     let textoSinEtiquetas = pageText.substring(startHoroscope, endHoroscope + 22)
-    .replace(/<[^>]+>|&nbsp;|\r|<|div class=/g, "");
+      .replace(/<[^>]+>|&nbsp;|\r|<|div class=/g, "");
 
 
     let startWeekText = textoSinEtiquetas.indexOf(`semanal`);
-    let endWeekText = textoSinEtiquetas.indexOf(`número de la suerte`);
-    let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7,endWeekText-3);
-    let lukyNumber =  textoSinEtiquetas.substring(endWeekText+19);
+    let endWeekText = textoSinEtiquetas.indexOf(`número de la`);
+    let predictionWeekly = textoSinEtiquetas.substring(startWeekText + 7, endWeekText - 3);
+    let lukyNumber = textoSinEtiquetas.substring(endWeekText + 19);
 
-    horoscope.lucky = lukyNumber.replace('.',"")
+    horoscope.lucky = lukyNumber.replace(/[^\d.]/g, "") != "" ?
+      lukyNumber.replace(/[^\d.]/g, "") :
+      (Math.floor(Math.random() * 10) + 1).toString();
+
     horoscope.weekly = predictionWeekly;
     horoscope.lastUpdatedWeekly = new Date();
   }

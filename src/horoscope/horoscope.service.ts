@@ -52,7 +52,7 @@ export class HoroscopeService {
     const now = new Date();
     const milisIn24Hours = 24 * 60 * 60 * 1000;
 
-    const diffInMilis = now.getTime() - horoscope.lastUpdatedDaily?.getTime() ?? 0;
+    const diffInMilis = now.getTime() - horoscope.lastUpdatedDaily?.getTime();
 
     if (horoscope.daily != undefined && diffInMilis < milisIn24Hours)
       return;
@@ -80,7 +80,7 @@ export class HoroscopeService {
     const now = new Date()
     const milisInOneWeek = 24 * 60 * 60 * 1000 * 7;
 
-    const diffInMilis = now.getTime() - horoscope.lastUpdatedWeekly?.getTime() ?? 0;
+    const diffInMilis = now.getTime() - horoscope.lastUpdatedWeekly?.getTime();
 
     if (horoscope.weekly != undefined && diffInMilis < milisInOneWeek)
       return;

@@ -70,7 +70,8 @@ export class HoroscopeService {
     textoSinEtiquetas = textoSinEtiquetas.replace(/&nbsp;/g, "");
     textoSinEtiquetas = textoSinEtiquetas.replace(/\r/g, "");
 
-    horoscope.daily = textoSinEtiquetas;
+    horoscope.daily = this.checkSpecialCharacters(textoSinEtiquetas)
+      ? "Predicción no disponible en este momento, intentelo mas tarde" : textoSinEtiquetas
     horoscope.lastUpdatedDaily = new Date();
 
     return;
@@ -107,8 +108,22 @@ export class HoroscopeService {
       lukyNumber.replace(/[^\d.]/g, "") :
       (Math.floor(Math.random() * 10) + 1).toString();
 
+    //Aseguramos que tenemos una prediccion correcta
+    if (horoscope.lucky.length > 2)
+      horoscope.lucky = (Math.floor(Math.random() * 10) + 1).toString();
+
+    predictionWeekly = this.checkSpecialCharacters(predictionWeekly)
+      ? "Predicción no disponible en este momento, intentelo mas tarde" : predictionWeekly
+
     horoscope.weekly = predictionWeekly;
     horoscope.lastUpdatedWeekly = new Date();
+  }
+
+  private checkSpecialCharacters(texto: string): boolean {
+    // Expresión regular para verificar la presencia de cualquiera de los caracteres {}[]/;\ 
+    const regex = /[{}\[\]\/;\\]/;
+
+    return regex.test(texto);
   }
 
   private async translatePrediction(language: string, prediction: string): Promise<string> {
